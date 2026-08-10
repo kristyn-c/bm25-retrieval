@@ -20,10 +20,12 @@ def load(corpus_path):
 def chunk(docs, min_tokens=30):
     chunks = {}
 
+
     for path, text in docs.items():
         # 1. Split the file on heading lines, keeping the headings.
         #    re.split with a capturing group returns:
         #    [preamble, heading1, body1, heading2, body2, ...]
+        text = re.sub(r'^---\n.*?\n---\n', '', text, flags=re.DOTALL)
         parts = re.split(r'^(#{1,3} .+)$', text, flags=re.MULTILINE)
 
         # 2. parts[0] is everything before the first heading (preamble)
@@ -48,7 +50,22 @@ def chunk(docs, min_tokens=30):
             chunks[doc_id] = body
     return chunks
 
+def tokenize(text):
+    """str -> list of terms"""
+    text = text.lower()
+    # crude: no stemming, no stopword removal. revisit later
+    terms = re.split(r'[^a-z0-9]+', text.lower())
+
+    return [t for t in terms if t]
+
+
+
+
+
 if __name__ == "__main__":
     docs = load(config.CORPUS_PATH)
     chunks = chunk(docs)
     print(f"{len(docs)} documents -> {len(chunks)} chunks")
+
+    sample = list(chunks.values())[0]
+    print(tokenize(sample)[:20])
