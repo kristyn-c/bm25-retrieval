@@ -110,3 +110,14 @@ if __name__ == "__main__":
     results = score("spectral clustering", index, doc_lengths, avgdl, N)
     for doc_id, s in sorted(results.items(), key= lambda x: -x[1])[:10]:
         print(f"{s:.2f} {doc_id}")
+
+    print([t for t in tokenize(chunks['Co-Create Marketplace.md#MVP shape']) if t in ('spectral','clustering')])
+
+    QUERIES = ["audio signal processing eeg", "eeg neurofeedback", "political philosophy",
+           "build system phases", "frustrating internship"]
+
+    for q in QUERIES:
+        print(f"\n=== {q} ===")
+        results = score(q, index, doc_lengths, avgdl, N)
+        for rank, (doc_id, s) in enumerate(sorted(results.items(), key=lambda x: -x[1])[:10], 1):
+            print(f"{rank:2d}. {s:5.2f}  {doc_id}")
