@@ -1,0 +1,19 @@
+What is the Probability Ranking Principle?	If documents are ranked by decreasing probability of relevance to the query, and those probabilities are estimated as accurately as possible, the overall effectiveness of the system is the best obtainable.
+What is the central question probabilistic IR asks?	Not "how similar is this document to the query" but "what is the probability this document is relevant to this information need" — an estimate that can, in principle, be checked.
+What is the Binary Independence Model?	Documents represented as binary term-incidence vectors (present/absent, no counts), with terms assumed independent given relevance. It ignores term frequency and document length entirely.
+What are the two assumptions in the name "Binary Independence"?	Binary: documents and queries are sets of present/absent terms. Independence: terms occur independently of one another given relevance — false in practice, but tractable.
+What is the Retrieval Status Value (RSV)?	The sum over query terms present in the document of log[p(1−u)] / [u(1−p)], where p = P(term present | relevant) and u = P(term present | non-relevant).
+Why add 0.5 to the counts in the RSJ weight?	Smoothing. Without it, a term appearing in every relevant document or none gives a zero or infinite estimate. The 0.5 keeps the log finite on sparse evidence.
+What does the RSJ weight reduce to with no relevance information?	Approximately idf. Assuming relevant documents are a tiny fraction of the collection makes the odds ratio collapse to log(N/df) — the probabilistic derivation of IDF.
+What are the three components of BM25?	(1) term frequency, with diminishing returns; (2) IDF, how rare the term is across the collection; (3) document length normalization against avgdl.
+What did BM25 add to the Binary Independence Model?	Term frequency and document length. The BIM only asked whether a term was present or absent — hence "a non-binary model".
+What does k1 control in BM25?	How fast term frequency saturates. As tf grows, tf(k1+1)/(tf + k1(...)) approaches k1+1 and stops.
+What does k1 = 0 do?	The tf fraction collapses to 1, so term frequency stops mattering. You recover the binary model — presence only.
+What does b control, and what do b=0 and b=1 do?	Document length normalization. b=0 turns it off; b=1 applies it fully; 0.75 is the conventional middle.
+What does k3 control?	Saturation of term frequency in the QUERY rather than the document. It matters only for long queries; for short ones it has no effect.
+Typical parameter values for BM25?	k1 in 1.2-2.0 (often 1.5), b = 0.75. These are empirical defaults from TREC experiments, not derived constants — tune them against a measured evaluation.
+What is BM25F?	A BM25 variant for documents with fields (title, abstract, body). Term frequencies are accumulated with per-field weights BEFORE saturation is applied, not scored per field and summed.
+Why do good models often contain their predecessors?	Zeroing a parameter recovers the older model. k1=0 gives the binary model; b=0 removes length normalization. When a formula has knobs, zeroing them shows you what it was built to fix.
+In a query with one common and one rare term, which drives the score?	The rare one. Its IDF is large; the common term's is near zero, so the common term contributes almost nothing however often it appears.
+How does relevance feedback work in the probabilistic model?	Judged relevant documents let you re-estimate p (the probability a term appears given relevance) directly, replacing the initial guess and re-ranking with better weights.
+What was the Bayesian network approach to IR?	A 1990s branch (Turtle & Croft) modelling query and document as nodes in an inference network. Formally rich, adopted in Inquery, but never widely displaced simpler models.

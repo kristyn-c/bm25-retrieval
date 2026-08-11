@@ -1,0 +1,24 @@
+What three things does an IR test collection need?	A document collection; a set of information needs expressed as queries; and relevance judgments (the gold standard) for each query-document pair.
+Relevance is judged against what?	The information need, not the query. A document matching every query term but never addressing the need is NOT relevant. The query is a lossy attempt to express the need.
+Name some standard test collections.	Cranfield (the original, ~1400 abstracts, exhaustively judged); the TREC collections; GOV2; Reuters-21578 and RCV1; 20 Newsgroups.
+Why is accuracy a bad measure for retrieval?	Relevant documents are a vanishing fraction of the collection, so a system returning nothing scores ~99.9% accurate. It is optimized by doing nothing.
+Define precision and recall.	Precision = relevant retrieved / total retrieved. Recall = relevant retrieved / total relevant. Same numerator; the denominators differ.
+How do precision and recall trade off?	Returning more documents can only raise recall and tends to lower precision. Returning everything gives recall 1 and near-zero precision.
+What is the F measure and why a harmonic mean?	The weighted harmonic mean of precision and recall. The harmonic mean punishes imbalance — a system with perfect precision and near-zero recall is not half-good.
+How do you compute a harmonic mean?	Flip each number, average the flipped numbers, flip the result back. For two inputs: 2PR/(P+R). The third step is the one people drop.
+Which mean inequality always holds?	AM ≥ GM ≥ HM for positive numbers. A harmonic mean above the arithmetic mean is impossible — treat it as an error signal.
+What does the harmonic mean penalize?	Imbalance, not lowness. (0.9, 0.9) gives exactly 0.9 — no penalty. But P=1.0, R=0.01 gives 0.0198 against an arithmetic mean of 0.505.
+In the F measure, what is β and what does β=1 mean?	β = how many times more you value recall than precision. β=1 is equal weight — that is the subscript in F1. β<1 favours precision.
+Relation between α and β in the F measure	β² = (1−α)/α. The definition is stated for the SQUARE — take the root before reporting β. At α=1/2, β²=1, so β=1.
+Why does the F measure have (β²+1) in its numerator?	It is a normalizer, forcing F = x when P = R = x. Without it, F values at different β would not be comparable.
+Why do precision-recall curves have a saw-tooth shape?	If the (k+1)th document is non-relevant, recall is unchanged but precision drops. If it is relevant, both rise. The curve jags down then up-and-right.
+What is interpolated precision?	p_interp(r) = the highest precision found at any recall level r' ≥ r. It removes the saw-tooth jitter, giving a monotonically decreasing curve.
+What is 11-point interpolated average precision?	Interpolated precision measured at recall 0.0, 0.1, ... 1.0 and averaged — a single-figure summary of the whole curve.
+What is MAP?	Mean Average Precision: for each query, average the precision measured at each relevant document's position; then average across queries. It rewards ranking relevant documents early.
+What does precision@k measure, and what is its main weakness?	Precision over the top k results only. It is set-based, so a relevant document at rank 1 counts the same as one at rank 10, and it ignores everything past k.
+What is R-precision?	Precision at rank R, where R is the number of known relevant documents for that query. It adapts the cutoff per query instead of fixing k.
+What is pooling?	Combine the top-k results from several systems into one pool, judge only that pool, and treat unjudged documents as non-relevant. It makes recall tractable on large collections.
+What measures whether two relevance judges agree?	The kappa statistic — agreement corrected for chance. Above ~0.8 is good, 0.67-0.8 fair, below 0.67 unreliable.
+Does judge disagreement invalidate a comparison between systems?	No. Absolute scores shift with the judge, but the relative ordering of systems is generally stable across judges.
+What is A/B testing in IR?	Route a small fraction of live traffic to a modified system and compare a behavioural metric (e.g. clickthrough). It measures real user utility rather than proxy relevance.
+Why do results snippets matter for evaluation?	The user judges relevance from the snippet, not the document. A good document with a misleading snippet is never clicked — so snippet quality is part of system quality.

@@ -1,0 +1,18 @@
+Why not just grep the collection for a term?	Linear scan is fine for small collections but does not scale, cannot support ranked retrieval, and cannot handle structured operators efficiently. Indexing trades build-time work for query-time speed.
+What is a term-document incidence matrix?	A |V| x N binary matrix, 1 if term t appears in document d. Conceptually clean but hopelessly sparse — the inverted index is its compressed form.
+What does an inverted index map to what?	Each term in the dictionary -> a postings list of the docIDs containing it.
+Why are the dictionary and the postings lists stored differently?	The dictionary is small enough to hold in memory; the postings lists are large and live on disk.
+What is a posting?	A single entry in a postings list — one docID, optionally carrying term frequency and positions. The term is not stored in the posting; it is the key you looked up.
+What are the major steps in building an inverted index?	Collect documents; tokenize; linguistically preprocess the tokens; sort the (term, docID) pairs by term then docID; merge duplicates and split into dictionary plus postings lists.
+Why must postings lists be sorted by docID?	So two lists can be merged in one linear pass with two pointers: compare the heads, emit or skip, advance the smaller.
+What is the complexity of "Brutus AND Caesar", and why?	O(x+y), where x and y are the postings list lengths. The intersection can only contain documents already in one of the two lists.
+What is the complexity of "Brutus AND NOT Caesar"?	Still O(x+y). NOT Caesar only removes documents from Brutus's list; you never leave the two lists.
+What is the complexity of "Brutus OR NOT Caesar", and why is it different?	O(N). The answer is nearly the whole collection, and you cannot print N docIDs in fewer than N steps. Output length lower-bounds runtime.
+State the general principle about NOT in an inverted index.	AND and OR are closed over the postings lists — they only produce documents already in one of them. NOT produces documents in neither, forcing a walk of the full collection.
+For a conjunctive (AND) query, what processing order is cheapest?	Increasing document frequency — start with the rarest term so every intermediate result stays small.
+For a query of ORs joined by AND, how do you estimate the order?	Estimate each disjunction's size as the sum of its terms' document frequencies, then process the resulting conjunction in increasing order of those estimates.
+Union vs intersection vs symmetric difference	Union (OR) = in at least one; overlap kept. Intersection (AND) = in both. Symmetric difference (XOR) = in exactly one; overlap discarded. XOR is not an IIR retrieval operator.
+Inclusion-exclusion for set sizes	|A ∪ B| = |A| + |B| − |A ∩ B|. Adding |A|+|B| alone double-counts the overlap. A result larger than N means you double-counted.
+De Morgan, in retrieval terms	NOT(A OR B) = (NOT A) AND (NOT B). To be excluded from a union, a document must fail every clause.
+What is the main limitation of Boolean retrieval?	No ranking — every matching document is equally good. Queries also tend to produce either far too many or far too few results, with no middle setting.
+Who still uses strict Boolean retrieval, and why?	Professional searchers in law and medicine (e.g. WestLaw), where precise, auditable, reproducible control over the result set matters more than convenience.

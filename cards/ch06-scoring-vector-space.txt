@@ -1,0 +1,18 @@
+What is the bag of words model?	A document is represented by which terms occur and how often, discarding word order. "Mary is quicker than John" and "John is quicker than Mary" have identical representations.
+What is term frequency (tf)?	The number of occurrences of term t in document d. Raw tf overstates relevance: a document with 10 occurrences is not 10 times more relevant than one with 1.
+What is log frequency weighting, and why use it?	w = 1 + log(tf) if tf > 0, else 0. It compresses raw counts so the tenth occurrence adds far less than the second — the same saturation idea BM25 formalizes with k1.
+Document frequency (df) vs collection frequency (cf)	df = how many documents contain the term. cf = total occurrences across the collection. df is the better discriminator: "insurance" and "try" can have similar cf but very different df.
+What is IDF?	idf(t) = log(N/df(t)). The weight derived from document frequency — rare terms score high, ubiquitous terms score ~0.
+What is log(N/df) for a term appearing in every document?	log(N/N) = log(1) = 0. A term in every document has zero discriminating power.
+Does the base of the logarithm in IDF matter for ranking?	No. Changing base multiplies every IDF by the same constant, and scaling all scores identically leaves the ordering unchanged.
+Does IDF affect one-term queries?	No. With a single term, every candidate document is scaled by the same IDF, so the ranking is unchanged. IDF only matters when terms compete.
+What is tf-idf, and when is it highest?	w = tf-weight x idf. Highest when a term occurs many times within a small number of documents; lowest when the term appears in nearly all documents.
+What is the vector space model?	Documents and queries are vectors in |V|-dimensional term space, one axis per vocabulary term. Similarity becomes a geometric relation between vectors.
+Why not use Euclidean distance between document vectors?	It is large for vectors of differing length. A document concatenated with itself has nearly identical content but sits far away in Euclidean terms.
+What is cosine similarity and what does it measure?	The cosine of the angle between two vectors: the dot product of their length-normalized forms. It compares direction — the relative mix of terms — while ignoring magnitude.
+Why does length normalization matter?	It stops long documents from dominating purely because they contain more of everything. In the vector space model it is Euclidean (L2) normalization; in BM25 it is division by avgdl.
+What is a length-normalized vector?	A vector divided by its L2 norm, giving unit length. Two documents with the same term proportions become identical after normalization.
+What is SMART notation?	A triple-letter code for the weighting scheme, written ddd.qqq — document scheme and query scheme. Each triple gives term frequency, document frequency, and normalization. lnc.ltc is the standard default.
+What does lnc.ltc mean?	Documents: logarithmic tf, no idf, cosine normalization. Queries: logarithmic tf, idf, cosine normalization. IDF is applied on the query side only, avoiding double-counting.
+What is the basic cosine-ranking algorithm?	Compute query term weights; for each query term, walk its postings list accumulating weighted scores per document; divide each document's score by its length; return the top K by heap.
+Why use a heap rather than a full sort for the top K?	Selecting the top K from N candidates costs O(N log K) with a heap versus O(N log N) for a full sort, and K is typically tiny compared to N.

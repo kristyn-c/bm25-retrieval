@@ -1,0 +1,13 @@
+What are the three components of BM25?	(1) term frequency — how often the term appears in THIS document, with diminishing returns; (2) IDF — how rare the term is across the collection; (3) document length normalization against avgdl.
+What question does each BM25 component answer?	tf asks about this document; IDF asks about the whole corpus; length normalization asks about this document's size.
+What is document frequency (df)?	The number of documents containing a term. In an inverted index it is free: len(index[term]).
+What is IDF, and what is log(N/df) for a term appearing in every document?	Inverse document frequency — the weight derived from df. When df ≈ N, log(N/N) = log(1) = 0. A term in every document has zero discriminating power.
+What is log(N/df) for a term in 2 of 1576 documents?	log10(788) ≈ 2.90. Contrast with 0 for a term in every document — that span is the whole of IDF.
+Does the base of the logarithm in IDF matter for ranking?	No. Changing base multiplies every IDF by the same constant, and scaling all scores identically leaves the ordering unchanged. Ranking depends on relative values only.
+In a query with one common and one rare term, which drives the score?	The rare one. Its IDF is large; the common term's is near zero, so the common term contributes almost nothing however often it appears. IDF decides which query terms are allowed to matter.
+What does k1 control in BM25?	How fast term frequency saturates. As tf grows, tf(k1+1)/(tf + k1(...)) approaches k1+1 and stops — the tenth occurrence adds far less than the second.
+What does k1 = 0 do?	The tf fraction collapses to 1, so term frequency stops mattering entirely. You recover the Binary Independence Model — presence only. This is what "a non-binary model" in the section title is defined against.
+What does b control, and what do b=0 and b=1 do?	Document length normalization. b=0 turns it off entirely; b=1 applies it fully; 0.75 is the conventional middle.
+Why do good models often contain their predecessors?	Zeroing a parameter recovers the older model. k1=0 gives the BIM; b=0 removes length normalization. When a formula has knobs, zeroing them shows you what it was built to fix.
+What did BM25 add to the Binary Independence Model?	Term frequency and document length. The BIM only asked whether a term was present or absent.
+What is avgdl and where does it come from?	The mean document length across the collection, computed in the same pass that builds the index. BM25 normalizes each document's length against it.
