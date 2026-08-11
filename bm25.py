@@ -1,6 +1,7 @@
 from pathlib import Path        # Path: an object representing a filesystem location
                                 # Replaces string-manipulation of paths with methods.
 import re
+from collections import Counter, defaultdict
 import config                   # Your gitignored config.py. Reading a .py file as a module
                                 # means CORPUS_PATH arrives as a real Python string
 
@@ -58,7 +59,20 @@ def tokenize(text):
 
     return [t for t in terms if t]
 
+def build(chunks):
+    """{doc_id: text} -> (index, doc_lengths, avgdl, N)"""
+    index = defaultdict(list) # term -> [(doc_id, tf), ...]
+    doc_lengths = {} # doc_id -> token count
+    for doc_id, text in chunks.items():
+        tokens = tokenize(text)
+        doc_lengths[doc_id] = len(tokens)
 
+        for term, count in Counter(tokens).items():
+            index[term].append((doc_id, count))
+    N = len(chunks)
+    avgdl = sum(doc_lengths.values()) / N
+
+    return index, doc_lengths, avgdl, N
 
 
 
@@ -69,3 +83,6 @@ if __name__ == "__main__":
 
     sample = list(chunks.values())[0]
     print(tokenize(sample)[:20])
+
+    index, doc_lengths, avgdl, N = build(chunks)
+    print(f"{N} doocs, {len(index)} terms, avgldl {avgdl:.1f}")
